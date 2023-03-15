@@ -1,10 +1,14 @@
+# Collect data with CARLA's scenario runner
+
 This is a modified version of CARLA's scenario runner release 0.9.13 to collect some data and save it in a convenient format after
 each scenario run.
 On first commit, the main modified files are:
+
 - `scenario_runner.py`: Additional CLI option to set savepath of data recording
 - `srunner/scenariomanager/scenario_manager.py`: Saves data from each simulated scenario to format similar to Waymo's tf.Example
 - `srunner/scenariomanager/carla_data_provider.py`: Keep track of Actor's states history throughout a scenario run, to be saved later
 - `srunner/scenarios/PedestrianCrossing.xml` and `srunner/scenarios/pedestrian_crossing.py`: Simplified version of existing scenario. It realizes a pedestrian crossing the street in front of the ego vehicle
+- If you want to run the scenario without the need to  separately launch manual_control.py and control the vehicle, you can uncomment lines 236 and 237  of `./scenario_runner.py`  that set the ego vehicle to autopilot (convenient extension would be to make this a extra parameter for when you run scenario_runner.py---> arg:autoPilot)
 
 ---
 
