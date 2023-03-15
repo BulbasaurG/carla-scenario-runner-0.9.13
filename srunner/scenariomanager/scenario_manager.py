@@ -123,6 +123,8 @@ class ScenarioManager(object):
             return 1
         if "pedestrian" in type_id:
             return 2
+        if "cyclist" in type_id:
+            return 3
         return 0
 
     def _save_to_waymo(self, recordWaymo, config):
