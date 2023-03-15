@@ -33,7 +33,7 @@ class ScenarioConfigurationParser(object):
         have that type are parsed and returned. Otherwise only the
         scenario that matches the scenario_name is parsed and returned.
         """
-
+        # os.env return the value of the environment variable if it exists, otherwise it returns the default value (2nd argument)
         list_of_config_files = glob.glob("{}/srunner/examples/*.xml".format(os.getenv('SCENARIO_RUNNER_ROOT', "./")))
 
         if config_file_name != '':
