@@ -232,10 +232,11 @@ class ScenarioRunner(object):
             for i, _ in enumerate(self.ego_vehicles):
                 self.ego_vehicles[i].set_transform(ego_vehicles[i].transform)
                 CarlaDataProvider.register_actor(self.ego_vehicles[i])
-
-        # for ego in self.ego_vehicles:
-        #     ego.set_autopilot(True)
-        #     print("Setting ego autopilot")
+        
+        if self._args.autoPilot:
+            for ego in self.ego_vehicles:
+                ego.set_autopilot(True)
+                print("Setting ego autopilot")
 
         # sync state
         if CarlaDataProvider.is_sync_mode():
@@ -394,7 +395,19 @@ class ScenarioRunner(object):
                                          debug_mode=self._args.debug)
             else:
                 scenario_class = self._get_scenario_class_or_fail(config.type)
-                scenario = scenario_class(self.world,
+                # some scenario.py may not initialized with the adversary_type argument
+                # we can either add with *kw to those scenarios, or use inspect to check the argument 
+                parms =  inspect.signature(scenario_class).parameters
+                rq_adversary = 'adversary_type' in parms
+                if rq_adversary:
+                    scenario = scenario_class(self.world,
+                                          self.ego_vehicles,
+                                          config,
+                                          self._args.randomize,
+                                          self._args.debug,
+                                          adversary_type=self._args.adversaryType)
+                else:
+                    scenario = scenario_class(self.world,
                                           self.ego_vehicles,
                                           config,
                                           self._args.randomize,
@@ -562,7 +575,7 @@ def main():
     parser.add_argument('--json', action="store_true", help='Write results into a JSON file')
     parser.add_argument('--outputDir', default='', help='Directory for output files (default: this directory)')
 
-    parser.add_argument('--configFile', default='', help='Provide an additional scenario configuration file (*.xml)')
+    parser.add_argument('--configFile', default='', help='Provide an additional scenario configuration file (*.xml),relative to SCENARIO_RUNNER_ROOT')
     parser.add_argument('--additionalScenario', default='', help='Provide additional scenario implementations (*.py)')
 
     parser.add_argument('--debug', action="store_true", help='Run with debug output')
@@ -577,6 +590,8 @@ def main():
     parser.add_argument('--randomize', action="store_true", help='Scenario parameters are randomized')
     parser.add_argument('--repetitions', default=1, type=int, help='Number of scenario executions')
     parser.add_argument('--waitForEgo', action="store_true", help='Connect the scenario to an existing ego vehicle')
+    parser.add_argument('--autoPilot', action="store_true", help='Enable autopilot for all vehicles')
+    parser.add_argument('--adversaryType',default=0,type=int,help='Type of adversary vehicle,0:pedestrian,1:cyclist')
 
     arguments = parser.parse_args()
     # pylint: enable=line-too-long
