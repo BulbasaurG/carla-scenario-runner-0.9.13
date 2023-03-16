@@ -171,13 +171,16 @@ class CarlaDataProvider(object):  # pylint: disable=too-many-public-methods
             location = transform.location
             rotation = transform.rotation
             velocity = actor.get_velocity()
+            bbox_extent = actor.bounding_box.extent
+            length,width = bbox_extent.x*2, bbox_extent.y*2
+            
 
             actor_history[actor_id]["state/x"].append(location.x)
             actor_history[actor_id]["state/y"].append(location.y)
             actor_history[actor_id]["state/bbox_yaw"].append(rotation.yaw)
-            actor_history[actor_id]["state/length"].append(2)  # ToDo
-            actor_history[actor_id]["state/width"].append(2)  # ToDo
-            actor_history[actor_id]["state/vel_yaw"].append(rotation.yaw)  # ToDo: Compute from velocities
+            actor_history[actor_id]["state/length"].append(length)  # ToDo
+            actor_history[actor_id]["state/width"].append(width)  # ToDo
+            actor_history[actor_id]["state/vel_yaw"].append(rotation.yaw)  # ToDo: Compute from velocities, not needed for now 16/03/2023
             actor_history[actor_id]["state/velocity_x"].append(velocity.x)
             actor_history[actor_id]["state/velocity_y"].append(velocity.y)
             actor_history[actor_id]["state/valid"].append(1)
