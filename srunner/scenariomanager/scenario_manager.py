@@ -184,27 +184,29 @@ class ScenarioManager(object):
         crosswalks = CarlaDataProvider._map.get_crosswalks()
 
         for i, wp in enumerate(waypoints):
-            rg_xyz[i] = [wp.transform.location.x, wp.transform.location.y, wp.transform.location.z]
+            rg_xyz[i,:] = np.array([wp.transform.location.x, wp.transform.location.y, wp.transform.location.z])
             forward_vec = wp.transform.rotation.get_forward_vector()
-            rg_dir[i] = [forward_vec.x, forward_vec.y, forward_vec.z]
+            rg_dir[i,:] = np.array([forward_vec.x, forward_vec.y, forward_vec.z])
             rg_type[i] = self.lane_type[wp.lane_type.name]  # ToDo
             rg_valid[i] = [1]
             rg_id[i] = wp.lane_id # ToDos
+        rg_id = np.array(rg_id, dtype=np.int32)
+        rg_type = np.array(rg_type, dtype=np.int32)
+        rg_valid = np.array(rg_valid, dtype=np.int32)
 
         def generate_cw_id(id):
-            while True:
-                if id in rg_id:
-                    id+=1
-                else:
-                    break
+            while id in rg_id:
+                id+=1
             return id
-        # assign id to crosswalks
+        first_cw = crosswalks[0]
         for i, cw in enumerate(crosswalks):
-            rg_xyz = np.append(rg_xyz, [cw.x, cw.y, cw.z])
-            rg_dir = np.append(rg_dir, [1, 1, 1])  # dummy value
+            rg_xyz = np.append(rg_xyz, np.array([[cw.x, cw.y, cw.z]]),axis=0)
+            rg_dir = np.append(rg_dir, np.array([[1, 1, 1]]),axis=0)  # dummy value
             rg_type = np.append(rg_type, self.lane_type['Crosswalk'])
             rg_valid = np.append(rg_valid, [1])
-            rg_id = np.append(rg_id, generate_cw_id(i))
+            if i==0 or first_cw.distance(cw) == 0:
+                cw_id = generate_cw_id(i)
+            rg_id = np.append(rg_id, cw_id)
 
         result["roadgraph_samples/xyz"] = rg_xyz
         result["roadgraph_samples/dir"] = rg_dir
