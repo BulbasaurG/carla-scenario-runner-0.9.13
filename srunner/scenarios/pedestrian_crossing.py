@@ -77,8 +77,8 @@ class PedestrianCrossing(BasicScenario):
         position_yaw = waypoint.transform.rotation.yaw + offset['position']
         orientation_yaw = waypoint.transform.rotation.yaw + offset['orientation']
         offset_location = carla.Location(
-            offset['k'] * lane_width * math.cos(math.radians(position_yaw)),
-            offset['k'] * lane_width * math.sin(math.radians(position_yaw)))
+            offset['k'] * lane_width * math.cos(math.radians(position_yaw)), # x
+            offset['k'] * lane_width * math.sin(math.radians(position_yaw))) # y
         location += offset_location
         location.z = self._trigger_location.z + offset['z']
         return carla.Transform(location, carla.Rotation(yaw=orientation_yaw)), orientation_yaw
@@ -136,7 +136,7 @@ class PedestrianCrossing(BasicScenario):
         while True:
             wp_next = waypoint.get_right_lane()
             self._num_lane_changes += 1
-            if wp_next is None or wp_next.lane_type == carla.LaneType.Sidewalk:
+            if wp_next is None or wp_next.lane_type == carla.LaneType.Sidewalk: #Check if this is the correct lane type
                 break
             elif wp_next.lane_type == carla.LaneType.Shoulder:
                 # Filter Parkings considered as Shoulders
