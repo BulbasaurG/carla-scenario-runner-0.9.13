@@ -108,11 +108,11 @@ class SignalizedJunctionLeftTurn(BasicScenario):
             plan.append((target_waypoint, RoadOption.LANEFOLLOW))
             wp_choice = target_waypoint.next(1.0)
         # adding flow of actors
-        actor_source = ActorSource(
-            ['vehicle.tesla.model3', 'vehicle.audi.tt'],
-            self._other_actor_transform, 15, self._blackboard_queue_name)
-        # destroying flow of actors
-        actor_sink = ActorSink(plan[-1][0].transform.location, 10)
+        # actor_source = ActorSource(
+        #     ['vehicle.tesla.model3', 'vehicle.audi.tt'],
+        #     self._other_actor_transform, 15, self._blackboard_queue_name)
+        # # destroying flow of actors
+        # actor_sink = ActorSink(plan[-1][0].transform.location, 10)
         # follow waypoints untill next intersection
         move_actor = WaypointFollower(self.other_actors[0], self._target_vel, plan=plan,
                                       blackboard_queue_name=self._blackboard_queue_name, avoid_collision=True)
@@ -123,8 +123,8 @@ class SignalizedJunctionLeftTurn(BasicScenario):
         root = py_trees.composites.Parallel(
             policy=py_trees.common.ParallelPolicy.SUCCESS_ON_ONE)
         root.add_child(wait)
-        root.add_child(actor_source)
-        root.add_child(actor_sink)
+        # root.add_child(actor_source)
+        # root.add_child(actor_sink)
         root.add_child(move_actor)
 
         sequence.add_child(ActorTransformSetter(self.other_actors[0], self._other_actor_transform))
