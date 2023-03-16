@@ -170,7 +170,7 @@ class ScenarioManager(object):
                     if len(result[key][i]) != len(history[key]):
                         f.write(f"actor_id:{actor_id}\nactor_type:{actor_type_map[actor_id]}\n \
                                 key:{key}\nlen(history):{len(history[key])}\nlen(result):{len(result[key][i])}\ntime_step:{num_steps}.\n")
-                # result[key][i] = history[key]
+                result[key][i] = history[key]
             with open("test.txt", "a") as f:
                 f.write(f"End\n")
 
