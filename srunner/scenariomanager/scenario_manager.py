@@ -176,9 +176,9 @@ class ScenarioManager(object):
 
         rg_xyz = np.full((NUM_RG_POINTS, 3), INIT_VALUE)
         rg_dir = np.full((NUM_RG_POINTS, 3), INIT_VALUE)
-        rg_type = np.full((NUM_RG_POINTS, 1), INIT_VALUE)
-        rg_valid = np.full((NUM_RG_POINTS, 1), INIT_VALUE_VALID)
-        rg_id = np.full((NUM_RG_POINTS, 1), INIT_VALUE)
+        rg_type = np.full((NUM_RG_POINTS, 1), INIT_VALUE, dtype=np.int32)
+        rg_valid = np.full((NUM_RG_POINTS, 1), INIT_VALUE_VALID, dtype=np.int32)
+        rg_id = np.full((NUM_RG_POINTS, 1), INIT_VALUE, dtype=np.int32)
         # roadgraph things
         waypoints = CarlaDataProvider._map.generate_waypoints(RG_RESOLUTION)
         crosswalks = CarlaDataProvider._map.get_crosswalks()
