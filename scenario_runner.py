@@ -423,7 +423,7 @@ class ScenarioRunner(object):
             if self._args.record:
                 recorder_name = "{}/{}/{}.log".format(
                     os.getenv('SCENARIO_RUNNER_ROOT', "./"), self._args.record, config.name)
-                self.client.start_recorder("/home/dguo/carlaSaved/recording01.log",True)
+                self.client.start_recorder(recorder_name,True) # TODO:this may blow up malloc. And this does not work because this method takes absolute path if there is /.
 
             # Load scenario and run it
             self.manager.load_scenario(scenario, self.agent_instance)
