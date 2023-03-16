@@ -17,3 +17,5 @@ results*.txt
 *.dot
 .idea
 .pylintrc
+
+test.txt
