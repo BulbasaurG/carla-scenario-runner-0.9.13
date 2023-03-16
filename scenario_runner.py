@@ -398,7 +398,7 @@ class ScenarioRunner(object):
                 # some scenario.py may not initialized with the adversary_type argument
                 # we can either add with *kw to those scenarios, or use inspect to check the argument 
                 parms =  inspect.signature(scenario_class).parameters
-                rq_adversary = 'adversary_type' in parms
+                rq_adversary = 'adversary_type' in parms.keys()
                 if rq_adversary:
                     scenario = scenario_class(self.world,
                                           self.ego_vehicles,
@@ -408,10 +408,10 @@ class ScenarioRunner(object):
                                           adversary_type=self._args.adversaryType)
                 else:
                     scenario = scenario_class(self.world,
-                                          self.ego_vehicles,
-                                          config,
-                                          self._args.randomize,
-                                          self._args.debug)
+                                            self.ego_vehicles,
+                                            config,
+                                            self._args.randomize,
+                                            self._args.debug)
         except Exception as exception:  # pylint: disable=broad-except
             print("The scenario cannot be loaded")
             traceback.print_exc()
@@ -595,7 +595,6 @@ def main():
 
     arguments = parser.parse_args()
     # pylint: enable=line-too-long
-
     if arguments.list:
         print("Currently the following scenarios are supported:")
         print(*ScenarioConfigurationParser.get_list_of_scenarios(arguments.configFile), sep='\n')
