@@ -67,6 +67,13 @@ class ScenarioManager(object):
         self.start_system_time = None
         self.end_system_time = None
 
+        # align carla lane type with waymo lane type
+        self.lane_type = {
+            'Driving':2, # surface street
+            'Biking':3, # bike lane
+            'Crosswalk':18, # crosswalk
+        }
+
     def _reset(self):
         """
         Reset all parameters
@@ -123,7 +130,7 @@ class ScenarioManager(object):
             return 1
         if "pedestrian" in type_id:
             return 2
-        if "cyclist" in type_id:
+        if "bicycle" in type_id:
             return 3
         return 0
 
@@ -156,9 +163,16 @@ class ScenarioManager(object):
         for i, (actor_id, history) in enumerate(actor_history.items()):
             actor_ids[i] = actor_id
             actor_types[i] = self._get_actor_type(actor_type_map[actor_id])
-
+            with open("test.txt", "a") as f:
+                f.write(f"Start\n")
             for key in actor_state_keys:
-                result[key][i] = history[key]
+                with open("test.txt", "a") as f:
+                    if len(result[key][i]) != len(history[key]):
+                        f.write(f"actor_id:{actor_id}\nactor_type:{actor_type_map[actor_id]}\n \
+                                key:{key}\nlen(history):{len(history[key])}\nlen(result):{len(result[key][i])}\ntime_step:{num_steps}.\n")
+                # result[key][i] = history[key]
+            with open("test.txt", "a") as f:
+                f.write(f"End\n")
 
         rg_xyz = np.full((NUM_RG_POINTS, 3), INIT_VALUE)
         rg_dir = np.full((NUM_RG_POINTS, 3), INIT_VALUE)
@@ -173,9 +187,24 @@ class ScenarioManager(object):
             rg_xyz[i] = [wp.transform.location.x, wp.transform.location.y, wp.transform.location.z]
             forward_vec = wp.transform.rotation.get_forward_vector()
             rg_dir[i] = [forward_vec.x, forward_vec.y, forward_vec.z]
-            rg_type[i] = [0]  # ToDo
+            rg_type[i] = self.lane_type[wp.lane_type.name]  # ToDo
             rg_valid[i] = [1]
-            rg_id[i] = i
+            rg_id[i] = wp.lane_id # ToDos
+
+        def generate_cw_id(id):
+            while True:
+                if id in rg_id:
+                    id+=1
+                else:
+                    break
+            return id
+        # assign id to crosswalks
+        for i, cw in enumerate(crosswalks):
+            rg_xyz = np.append(rg_xyz, [cw.x, cw.y, cw.z])
+            rg_dir = np.append(rg_dir, [1, 1, 1])  # dummy value
+            rg_type = np.append(rg_type, self.lane_type['Crosswalk'])
+            rg_valid = np.append(rg_valid, [1])
+            rg_id = np.append(rg_id, generate_cw_id(i))
 
         result["roadgraph_samples/xyz"] = rg_xyz
         result["roadgraph_samples/dir"] = rg_dir
