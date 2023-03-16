@@ -193,6 +193,7 @@ class ScenarioManager(object):
         rg_id = np.array(rg_id, dtype=np.int32)
         rg_type = np.array(rg_type, dtype=np.int32)
         rg_valid = np.array(rg_valid, dtype=np.int32)
+        lg_wp = len(waypoints)
 
         def generate_cw_id(id):
             while id in rg_id:
@@ -200,13 +201,13 @@ class ScenarioManager(object):
             return id
         first_cw = crosswalks[0]
         for i, cw in enumerate(crosswalks):
-            rg_xyz = np.append(rg_xyz, np.array([[cw.x, cw.y, cw.z]]),axis=0)
-            rg_dir = np.append(rg_dir, np.array([[1, 1, 1]]),axis=0)  # dummy value
-            rg_type = np.append(rg_type, self.lane_type['Crosswalk'])
-            rg_valid = np.append(rg_valid, [1])
+            rg_xyz[i+lg_wp+1,:] = np.array([[cw.x, cw.y, cw.z]])
+            rg_dir[i+lg_wp+1,:] = np.array([[1, 1, 1]])  # dummy value
+            rg_type[i+lg_wp+1] = self.lane_type['Crosswalk']
+            rg_valid[i+lg_wp+1] = [1]
             if i==0 or first_cw.distance(cw) == 0:
                 cw_id = generate_cw_id(i)
-            rg_id = np.append(rg_id, cw_id)
+            rg_id[i+lg_wp+1] = cw_id
 
         result["roadgraph_samples/xyz"] = rg_xyz
         result["roadgraph_samples/dir"] = rg_dir
