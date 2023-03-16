@@ -425,8 +425,6 @@ class ScenarioRunner(object):
                     os.getenv('SCENARIO_RUNNER_ROOT', "./"), self._args.record, config.name)
                 self.client.start_recorder("/home/dguo/carlaSaved/recording01.log",True)
 
-            with open('test.txt', 'w') as f:
-                f.write(f"recorder_name: {recorder_name}")
             # Load scenario and run it
             self.manager.load_scenario(scenario, self.agent_instance)
             self.manager.run_scenario(self._args.recordWaymo, config)
@@ -549,7 +547,7 @@ def main():
                         help='IP of the host server (default: localhost)')
     parser.add_argument('--port', default='2000',
                         help='TCP port to listen to (default: 2000)')
-    parser.add_argument('--timeout', default="10.0",
+    parser.add_argument('--timeout', default="20.0",
                         help='Set the CARLA client timeout value in seconds')
     parser.add_argument('--trafficManagerPort', default='8000',
                         help='Port to use for the TrafficManager (default: 8000)')
