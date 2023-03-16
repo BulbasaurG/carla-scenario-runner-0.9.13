@@ -23,7 +23,7 @@ from srunner.scenarios.basic_scenario import BasicScenario
 from srunner.tools.scenario_helper import get_location_in_distance_from_wp
 
 
-class PedestrianCrossing(BasicScenario):
+class BikePassingby(BasicScenario):
 
     def __init__(self, world, ego_vehicles, config, randomize=False,
                  debug_mode=False, criteria_enable=True, adversary_type=False, timeout=60):
@@ -54,7 +54,7 @@ class PedestrianCrossing(BasicScenario):
 
         self._ego_route = CarlaDataProvider.get_ego_vehicle_route()
 
-        super(PedestrianCrossing, self).__init__("PedestrianCrossing",
+        super(BikePassingby, self).__init__("BikePassingby",
                                                  ego_vehicles,
                                                  config,
                                                  world,

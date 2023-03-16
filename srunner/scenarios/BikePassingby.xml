@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <scenarios>
-    <scenario name="PedestrianCrossing_0" type="PedestrianCrossing" town="Town03_Opt">
+    <scenario name="BikePassingby_0" type="BikePassingby" town="Town03_Opt">
         <ego_vehicle x="130" y="129" z="1" yaw="180" model="vehicle.lincoln.mkz_2017" />
         <weather cloudiness="0" precipitation="0" precipitation_deposits="0" wind_intensity="0" sun_azimuth_angle="0" sun_altitude_angle="75" />
     </scenario>
