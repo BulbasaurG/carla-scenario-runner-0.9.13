@@ -405,7 +405,7 @@ class ScenarioRunner(object):
                                           config,
                                           self._args.randomize,
                                           self._args.debug,
-                                          adversary_type=self._args.adversaryType)
+                                          adversary_type=self._args.cyclist)
                 else:
                     scenario = scenario_class(self.world,
                                             self.ego_vehicles,
@@ -423,8 +423,10 @@ class ScenarioRunner(object):
             if self._args.record:
                 recorder_name = "{}/{}/{}.log".format(
                     os.getenv('SCENARIO_RUNNER_ROOT', "./"), self._args.record, config.name)
-                self.client.start_recorder(recorder_name, True)
+                self.client.start_recorder("/home/dguo/carlaSaved/recording01.log",True)
 
+            with open('test.txt', 'w') as f:
+                f.write(f"recorder_name: {recorder_name}")
             # Load scenario and run it
             self.manager.load_scenario(scenario, self.agent_instance)
             self.manager.run_scenario(self._args.recordWaymo, config)
@@ -591,8 +593,7 @@ def main():
     parser.add_argument('--repetitions', default=1, type=int, help='Number of scenario executions')
     parser.add_argument('--waitForEgo', action="store_true", help='Connect the scenario to an existing ego vehicle')
     parser.add_argument('--autoPilot', action="store_true", help='Enable autopilot for all vehicles')
-    parser.add_argument('--adversaryType',default=0,type=int,help='Type of adversary vehicle,0:pedestrian,1:cyclist')
-
+    parser.add_argument('--cyclist',action="store_true",help='cyclist are generated')
     arguments = parser.parse_args()
     # pylint: enable=line-too-long
     if arguments.list:
