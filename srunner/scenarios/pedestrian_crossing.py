@@ -88,7 +88,7 @@ class PedestrianCrossing(BasicScenario):
         self._time_to_reach *= self._num_lane_changes
         if self._adversary_type is False:
             self._walker_yaw = orientation_yaw
-            self._other_actor_target_velocity = 3 + (0.4 * self._num_lane_changes)
+            self._other_actor_target_velocity = 1 + (0.4 * self._num_lane_changes)
             walker = CarlaDataProvider.request_new_actor('walker.*', transform)
             adversary = walker
         else:
