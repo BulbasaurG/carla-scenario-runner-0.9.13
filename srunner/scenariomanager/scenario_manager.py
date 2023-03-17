@@ -24,7 +24,7 @@ from srunner.scenariomanager.watchdog import Watchdog
 import numpy as np
 import os
 import pickle
-
+import matplotlib.pyplot as plt
 
 class ScenarioManager(object):
     """
@@ -126,15 +126,15 @@ class ScenarioManager(object):
 
     def _get_actor_type(self, type_id):
         # Unset = 0, Vehicle = 1, Pedestrian = 2, Cyclist = 3, Other = 4
+        if "vehicle.diamondback.century" in type_id: # bicycle
+            return 3
         if "vehicle" in type_id:
             return 1
         if "pedestrian" in type_id:
             return 2
-        if "bicycle" in type_id:
-            return 3
         return 0
 
-    def _save_to_waymo(self, recordWaymo, config):
+    def _save_to_waymo(self, recordWaymo, config, data_id:str):
         # toDo: round to cm or mm
         actor_state_keys = CarlaDataProvider._actor_state_keys
         actor_history = CarlaDataProvider._actor_history
@@ -163,16 +163,16 @@ class ScenarioManager(object):
         for i, (actor_id, history) in enumerate(actor_history.items()):
             actor_ids[i] = actor_id
             actor_types[i] = self._get_actor_type(actor_type_map[actor_id])
-            with open("test.txt", "a") as f:
-                f.write(f"Start\n")
+            # with open("test.txt", "a") as f:
+            #     f.write(f"Start\n")
             for key in actor_state_keys:
-                with open("test.txt", "a") as f:
-                    if len(result[key][i]) != len(history[key]):
-                        f.write(f"actor_id:{actor_id}\nactor_type:{actor_type_map[actor_id]}\n \
-                                key:{key}\nlen(history):{len(history[key])}\nlen(result):{len(result[key][i])}\ntime_step:{num_steps}.\n")
+                # with open("test.txt", "a") as f:
+                #     if len(result[key][i]) != len(history[key]):
+                #         f.write(f"actor_id:{actor_id}\nactor_type:{actor_type_map[actor_id]}\n \
+                #                 key:{key}\nlen(history):{len(history[key])}\nlen(result):{len(result[key][i])}\ntime_step:{num_steps}.\n")
                 result[key][i] = history[key]
-            with open("test.txt", "a") as f:
-                f.write(f"End\n")
+            # with open("test.txt", "a") as f:
+            #     f.write(f"End\n")
 
         rg_xyz = np.full((NUM_RG_POINTS, 3), INIT_VALUE)
         rg_dir = np.full((NUM_RG_POINTS, 3), INIT_VALUE)
@@ -200,13 +200,20 @@ class ScenarioManager(object):
                 id+=1
             return id
         first_cw = crosswalks[0]
+        flag=1
         for i, cw in enumerate(crosswalks):
             rg_xyz[i+lg_wp+1,:] = np.array([[cw.x, cw.y, cw.z]])
             rg_dir[i+lg_wp+1,:] = np.array([[1, 1, 1]])  # dummy value
             rg_type[i+lg_wp+1] = self.lane_type['Crosswalk']
             rg_valid[i+lg_wp+1] = [1]
-            if i==0 or first_cw.distance(cw) == 0:
+            if i==0:
                 cw_id = generate_cw_id(i)
+            elif first_cw.distance(cw)==0:
+                flag=0
+            elif not flag:
+                flag=1
+                cw_id = generate_cw_id(i)
+                first_cw = cw
             rg_id[i+lg_wp+1] = cw_id
 
         result["roadgraph_samples/xyz"] = rg_xyz
@@ -218,13 +225,31 @@ class ScenarioManager(object):
         result["state/id"] = actor_ids
         result["state/type"] = actor_types
 
-        filename = "{}/{}/{}.pkl".format(os.getenv('SCENARIO_RUNNER_ROOT', "./"), recordWaymo, config.name)
+        filename = config.name.split("_")[0]+"-"+data_id+"-of-00010"
+        filepath = "{}/{}/{}.pkl".format(os.getenv('SCENARIO_RUNNER_ROOT', "./"), recordWaymo, filename)
+        self._save_plot(result, filename, recordWaymo)
 
-        with open(filename, "wb") as f:
+        with open(filepath, "wb") as f:
             pickle.dump(result, f)
-        print("Saved to ", filename)
+        print("Saved data to ", filepath)
+    
+    def _save_plot(self, data, figname, recordWaymo):
+        # save a simple plot to see whether the actor is moving
+        figpath = "{}/{}/{}.jpg".format(os.getenv('SCENARIO_RUNNER_ROOT', "./"), recordWaymo, figname)
+        car_ind = np.where(data['state/type']==1)[0]
+        ped_ind = np.where(data['state/type']==2)[0]
+        cyc_ind = np.where(data['state/type']==3)[0]
+        for i, car in enumerate(car_ind):
+            plt.plot(data["state/x"][car].squeeze(),data["state/y"][car].squeeze(),label=f"car_{i}")
+        for i, ped in enumerate(ped_ind):
+            plt.plot(data["state/x"][ped].squeeze(),data["state/y"][ped].squeeze(),label=f"ped_{i}")
+        for i, cyc in enumerate(cyc_ind):
+            plt.plot(data["state/x"][cyc].squeeze(),data["state/y"][cyc].squeeze(),label=f"cyc_{i}")
+        plt.legend()
+        plt.savefig(figpath)
+        print("Saved plot to ", figpath)
 
-    def run_scenario(self, recordWaymo, config):
+    def run_scenario(self, recordWaymo, config, data_id: str):
         """
         Trigger the start of the scenario and wait for it to finish/fail
         """
@@ -248,7 +273,7 @@ class ScenarioManager(object):
 
         # Save data to waymo format
         if recordWaymo:
-            self._save_to_waymo(recordWaymo, config)
+            self._save_to_waymo(recordWaymo, config, data_id)
         self.cleanup()
 
         self.end_system_time = time.time()
