@@ -19,3 +19,4 @@ results*.txt
 .pylintrc
 
 test.txt
+recordWaymo/
