@@ -427,7 +427,7 @@ class ScenarioRunner(object):
 
             # Load scenario and run it
             self.manager.load_scenario(scenario, self.agent_instance)
-            self.manager.run_scenario(self._args.recordWaymo, config)
+            self.manager.run_scenario(self._args.recordWaymo, config, self._args.data_id)
 
             # Provide outputs if required
             self._analyze_scenario(config)
@@ -592,6 +592,7 @@ def main():
     parser.add_argument('--waitForEgo', action="store_true", help='Connect the scenario to an existing ego vehicle')
     parser.add_argument('--autoPilot', action="store_true", help='Enable autopilot for all vehicles')
     parser.add_argument('--cyclist',action="store_true",help='cyclist are generated')
+    parser.add_argument('--data_id', type=str, default='00000', help='5 digits carla generated data id, eg:00000')
     arguments = parser.parse_args()
     # pylint: enable=line-too-long
     if arguments.list:
