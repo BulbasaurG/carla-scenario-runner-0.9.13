@@ -55,7 +55,6 @@ class BikePassingby(BasicScenario):
         self._bike_start_distance = 40 + (self._random * 5)
 
         self._ego_route = CarlaDataProvider.get_ego_vehicle_route()
-
         super(BikePassingby, self).__init__("BikePassingby",
                                                  ego_vehicles,
                                                  config,
@@ -99,7 +98,6 @@ class BikePassingby(BasicScenario):
             first_vehicle = CarlaDataProvider.request_new_actor('vehicle.diamondback.century', transform)
             first_vehicle.set_simulate_physics(enabled=False)
             adversary = first_vehicle
-
         return adversary
 
     def _spawn_blocker(self, transform, orientation_yaw):
@@ -194,7 +192,8 @@ class BikePassingby(BasicScenario):
         lane_width = self._reference_waypoint.lane_width
         lane_width = lane_width + (1.25 * lane_width * self._num_lane_changes)
 
-        dist_to_trigger = self._bike_start_distance / 2 + self._num_lane_changes
+        # dist_to_trigger = self._bike_start_distance / 2 + self._num_lane_changes
+        dist_to_trigger = self._bike_start_distance
         # leaf nodes
         if self._ego_route is not None:
             start_condition = InTriggerDistanceToLocationAlongRoute(self.ego_vehicles[0],
