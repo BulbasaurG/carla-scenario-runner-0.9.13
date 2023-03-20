@@ -175,8 +175,8 @@ class CarlaDataProvider(object):  # pylint: disable=too-many-public-methods
             length,width = bbox_extent.x*2, bbox_extent.y*2
             # In the blueprint, bike width is 0 (github issue #5376). We set it to 0.8m
             # Info: Pedestrian width and length are appr. 0.37m.
-            if not width:
-                width = 0.8
+            length = 0.8 if length < 0.8 else length
+            width = 0.8 if width < 0.8 else width
 
             actor_history[actor_id]["state/x"].append(location.x)
             actor_history[actor_id]["state/y"].append(location.y)
