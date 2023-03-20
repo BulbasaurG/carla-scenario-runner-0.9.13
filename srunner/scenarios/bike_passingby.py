@@ -21,7 +21,7 @@ from srunner.scenariomanager.scenarioatomics.atomic_trigger_conditions import (I
 from srunner.scenariomanager.timer import TimeOut
 from srunner.scenarios.basic_scenario import BasicScenario
 from srunner.tools.scenario_helper import get_location_in_distance_from_wp
-
+import secrets
 
 class BikePassingby(BasicScenario):
 
@@ -50,7 +50,9 @@ class BikePassingby(BasicScenario):
         self._number_of_attempts = 20
         # Number of attempts made so far
         self._spawn_attempted = 0
-        self._pedestrian_start_distance = 40
+        self._random = secrets.randbelow(
+            20)/20-0.5 if randomize else 0  # [-1,0)
+        self._bike_start_distance = 40 + (self._random * 5)
 
         self._ego_route = CarlaDataProvider.get_ego_vehicle_route()
 
@@ -74,11 +76,11 @@ class BikePassingby(BasicScenario):
         location, _ = get_location_in_distance_from_wp(waypoint, _start_distance, stop_at_junction)
         waypoint = self._wmap.get_waypoint(location)
         offset = {"orientation": 0, "position": 90, "z": 0.0, "k": 1.0}
-        position_yaw = waypoint.transform.rotation.yaw + offset['position']
-        orientation_yaw = waypoint.transform.rotation.yaw + offset['orientation']
+        position_yaw = waypoint.transform.rotation.yaw + offset['position'] + self._random * 10
+        orientation_yaw = waypoint.transform.rotation.yaw + offset['orientation'] + self._random * 10
         offset_location = carla.Location(
-            offset['k'] * lane_width * math.cos(math.radians(position_yaw)), # TODO:x
-            offset['k'] * (lane_width/2-1.5) * math.sin(math.radians(position_yaw))) # TODO: y
+            offset['k'] * lane_width * math.cos(math.radians(position_yaw)), # x
+            offset['k'] * (lane_width/2-1.5+self._random) * math.sin(math.radians(position_yaw))) # y
         location += offset_location
         location.z = self._trigger_location.z + offset['z']
         return carla.Transform(location, carla.Rotation(yaw=orientation_yaw)), orientation_yaw
@@ -89,11 +91,11 @@ class BikePassingby(BasicScenario):
 
         if self._adversary_type is False:
             self._walker_yaw = orientation_yaw
-            self._other_actor_target_velocity = 3 + (0.4 * self._num_lane_changes)
+            self._other_actor_target_velocity = 1 + (0.4 * self._num_lane_changes) + self._random
             walker = CarlaDataProvider.request_new_actor('walker.*', transform)
             adversary = walker
         else:
-            self._other_actor_target_velocity = self._other_actor_target_velocity * self._num_lane_changes
+            self._other_actor_target_velocity = self._other_actor_target_velocity * self._num_lane_changes + self._random
             first_vehicle = CarlaDataProvider.request_new_actor('vehicle.diamondback.century', transform)
             first_vehicle.set_simulate_physics(enabled=False)
             adversary = first_vehicle
@@ -130,7 +132,7 @@ class BikePassingby(BasicScenario):
         Custom initialization
         """
         # cyclist transform
-        _start_distance = self._pedestrian_start_distance
+        _start_distance = self._bike_start_distance
         # We start by getting and waypoint in the closest sidewalk.
         waypoint = self._reference_waypoint
         while True:
@@ -192,7 +194,7 @@ class BikePassingby(BasicScenario):
         lane_width = self._reference_waypoint.lane_width
         lane_width = lane_width + (1.25 * lane_width * self._num_lane_changes)
 
-        dist_to_trigger = self._pedestrian_start_distance / 2 + self._num_lane_changes
+        dist_to_trigger = self._bike_start_distance / 2 + self._num_lane_changes
         # leaf nodes
         if self._ego_route is not None:
             start_condition = InTriggerDistanceToLocationAlongRoute(self.ego_vehicles[0],
