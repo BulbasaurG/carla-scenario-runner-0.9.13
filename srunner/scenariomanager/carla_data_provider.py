@@ -16,6 +16,7 @@ import math
 import re
 from numpy import random
 from six import iteritems
+import numpy as np
 
 import carla
 
@@ -78,7 +79,9 @@ class CarlaDataProvider(object):  # pylint: disable=too-many-public-methods
         "state/vel_yaw",
         "state/velocity_x",
         "state/velocity_y",
-        "state/valid"
+        "state/valid",
+        "state/length_1",
+        "state/width_1",
     ]
 
     # ToDo: support removal of actors during scenario exectuion
@@ -179,15 +182,25 @@ class CarlaDataProvider(object):  # pylint: disable=too-many-public-methods
             # width = 0.8 if width < 0.8 else width
 
             # check if the vertices will provide better length and width
-            lc_vtc = actor.bounding_box.get_local_vertices()
-            dist_vx = [lc_vtc[0].distance(lc_vx) for lc_vx in lc_vtc]
-            num_dist = len(dist_vx)
-            length_1,width_1 = dist_vx.sort()[-2], dist_vx.sort()[1]
+            lc_vtc = actor.bounding_box.get_world_vertices(transform)
+            new_lc_vtc = []
+            new_dist_lc_vtc = np.zeros(4)
+            for i,lc_vx in enumerate(lc_vtc):
+                if i==0:
+                    start_lv_vx = lc_vx
+                    new_lc_vtc.append(lc_vx)
+                    new_dist_lc_vtc = np.append(new_dist_lc_vtc,0)
+                elif lc_vx.z == start_lv_vx.z and start_lv_vx.distance(lc_vx) > 0:
+                    new_lc_vtc.append(lc_vx)
+                    new_dist_lc_vtc = np.append(new_dist_lc_vtc,start_lv_vx.distance(lc_vx))
+            new_dist_lc_vtc = np.sort(new_dist_lc_vtc)
+            length_1,width_1 = new_dist_lc_vtc[-2], new_dist_lc_vtc[-3]
 
+            # actor_history[actor_id]["state/length_1"].append(length_1)
+            # actor_history[actor_id]["state/width_1"].append(width_1)
+            # actor_history[actor_id]["state/num_dist"].append(num_dist)
             actor_history[actor_id]["state/length_1"].append(length_1)
             actor_history[actor_id]["state/width_1"].append(width_1)
-            actor_history[actor_id]["state/num_dist"].append(num_dist)
-            actor_history[actor_id]["state/dist_vx"].append(dist_vx)
 
             actor_history[actor_id]["state/x"].append(location.x)
             actor_history[actor_id]["state/y"].append(location.y)
