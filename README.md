@@ -10,6 +10,28 @@ On first commit, the main modified files are:
 - `srunner/scenarios/PedestrianCrossing.xml` and `srunner/scenarios/pedestrian_crossing.py`: Simplified version of existing scenario. It realizes a pedestrian crossing the street in front of the ego vehicle
 - If you want to run the scenario without the need to  separately launch manual_control.py and control the vehicle, you can uncomment lines 236 and 237  of `./scenario_runner.py`  that set the ego vehicle to autopilot (convenient extension would be to make this a extra parameter for when you run scenario_runner.py---> arg:autoPilot)
 
+Notes:
+
+```shell
+# run carla
+cd /opt/carla-simulator
+./CarlaUE4.sh -quality-level=low
+```
+
+```shell
+# run scenario for pedestrian and cyclists
+# open a new terminal
+cd carla-scenario-runner-0.9.13/
+python3 scenario_runner.py --scenario PedestrianCrossing_0 --configFile ./srunner/scenarios/PedestrianCrossing.xml --recordWaymo ./recordWaymo --reloadWorld --randomize --sync  --autoPilot --data_id 00000
+--cyclist #(for bike)
+```
+
+```shell
+# run car scenario
+cd carla-scenario-runner-0.9.13/
+python3 scenario_runner.py --scenario SignalizedJunctionLeftTurn_1 --recordWaymo ./recordWaymo --reloadWorld --randomize --sync  --autoPilot --data_id 00000
+```
+
 ---
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
