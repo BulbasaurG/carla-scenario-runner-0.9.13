@@ -52,8 +52,8 @@ class PedestrianCrossing(BasicScenario):
         # Number of attempts made so far
         self._spawn_attempted = 0
         self._random = secrets.randbelow(
-            20)/20-0.5 if randomize else 0  # [-1,0)
-        self._pedestrian_start_distance = 40 + (self._random * 5)
+            20)/20-0.5 if randomize else 0  # [-0.5,0.5)
+        self._pedestrian_start_distance = 40 + (self._random * 4)
 
         self._ego_route = CarlaDataProvider.get_ego_vehicle_route()
 
@@ -91,7 +91,7 @@ class PedestrianCrossing(BasicScenario):
         self._time_to_reach *= self._num_lane_changes
         if self._adversary_type is False:
             self._walker_yaw = orientation_yaw
-            self._other_actor_target_velocity = 1 + (0.4 * self._num_lane_changes) + self._random / 2
+            self._other_actor_target_velocity = 1 + (0.4 * self._num_lane_changes) + self._random
             walker = CarlaDataProvider.request_new_actor('walker.*', transform)
             adversary = walker
         else:
