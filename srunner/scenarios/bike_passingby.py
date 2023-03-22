@@ -51,8 +51,8 @@ class BikePassingby(BasicScenario):
         # Number of attempts made so far
         self._spawn_attempted = 0
         self._random = secrets.randbelow(
-            20)/20-0.5 if randomize else 0  # [-1,0)
-        self._bike_start_distance = 40 + (self._random * 5)
+            20)/20-0.5 if randomize else 0  # [-0.5,0.5)
+        self._bike_start_distance = 10 + (self._random * 5)
 
         self._ego_route = CarlaDataProvider.get_ego_vehicle_route()
         super(BikePassingby, self).__init__("BikePassingby",
@@ -79,7 +79,7 @@ class BikePassingby(BasicScenario):
         orientation_yaw = waypoint.transform.rotation.yaw + offset['orientation'] + self._random * 10
         offset_location = carla.Location(
             offset['k'] * lane_width * math.cos(math.radians(position_yaw)), # x
-            offset['k'] * (lane_width/2-1.5+self._random) * math.sin(math.radians(position_yaw))) # y
+            offset['k'] * (lane_width/2-1.5) * math.sin(math.radians(position_yaw))) # y
         location += offset_location
         location.z = self._trigger_location.z + offset['z']
         return carla.Transform(location, carla.Rotation(yaw=orientation_yaw)), orientation_yaw
