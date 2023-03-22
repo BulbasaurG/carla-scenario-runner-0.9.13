@@ -184,9 +184,9 @@ class ScenarioManager(object):
         crosswalks = CarlaDataProvider._map.get_crosswalks()
 
         for i, wp in enumerate(waypoints):
-            rg_xyz[i,:] = np.array([wp.transform.location.x, wp.transform.location.y, wp.transform.location.z])
+            rg_xyz[i,:] = np.array([wp.transform.location.x, -wp.transform.location.y, wp.transform.location.z])
             forward_vec = wp.transform.rotation.get_forward_vector()
-            rg_dir[i,:] = np.array([forward_vec.x, forward_vec.y, forward_vec.z])
+            rg_dir[i,:] = np.array([forward_vec.x, -forward_vec.y, forward_vec.z])
             rg_type[i] = self.lane_type[wp.lane_type.name]  # ToDo
             rg_valid[i] = [1]
             rg_id[i] = wp.lane_id # ToDos
@@ -202,7 +202,7 @@ class ScenarioManager(object):
         first_cw = crosswalks[0]
         flag=1
         for i, cw in enumerate(crosswalks):
-            rg_xyz[i+lg_wp+1,:] = np.array([[cw.x, cw.y, cw.z]])
+            rg_xyz[i+lg_wp+1,:] = np.array([[cw.x, -cw.y, cw.z]])
             rg_dir[i+lg_wp+1,:] = np.array([[1, 1, 1]])  # dummy value
             rg_type[i+lg_wp+1] = self.lane_type['Crosswalk']
             rg_valid[i+lg_wp+1] = [1]
