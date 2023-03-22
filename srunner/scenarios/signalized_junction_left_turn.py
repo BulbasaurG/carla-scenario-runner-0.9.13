@@ -25,6 +25,7 @@ from srunner.scenariomanager.scenarioatomics.atomic_criteria import CollisionTes
 from srunner.scenariomanager.scenarioatomics.atomic_trigger_conditions import DriveDistance
 from srunner.scenarios.basic_scenario import BasicScenario
 from srunner.tools.scenario_helper import generate_target_waypoint
+import secrets
 
 
 class SignalizedJunctionLeftTurn(BasicScenario):
@@ -54,13 +55,14 @@ class SignalizedJunctionLeftTurn(BasicScenario):
         self._blackboard_queue_name = 'SignalizedJunctionLeftTurn/actor_flow_queue'
         self._queue = py_trees.blackboard.Blackboard().set(self._blackboard_queue_name, Queue())
         self._initialized = True
+        self._random = secrets.randbelow(
+            20)/20-0.5 if randomize else 0  # [-0.5,0.5)
         super(SignalizedJunctionLeftTurn, self).__init__("TurnLeftAtSignalizedJunction",
                                                          ego_vehicles,
                                                          config,
                                                          world,
                                                          debug_mode,
                                                          criteria_enable=criteria_enable)
-
         self._traffic_light = CarlaDataProvider.get_next_traffic_light(self.ego_vehicles[0], False)
         traffic_light_other = CarlaDataProvider.get_next_traffic_light(self.other_actors[0], False)
         if self._traffic_light is None or traffic_light_other is None:
@@ -77,8 +79,8 @@ class SignalizedJunctionLeftTurn(BasicScenario):
         """
         self._other_actor_transform = config.other_actors[0].transform
         first_vehicle_transform = carla.Transform(
-            carla.Location(config.other_actors[0].transform.location.x,
-                           config.other_actors[0].transform.location.y,
+            carla.Location(config.other_actors[0].transform.location.x + self._random,
+                           config.other_actors[0].transform.location.y + self._random,
                            config.other_actors[0].transform.location.z - 500),
             config.other_actors[0].transform.rotation)
         first_vehicle = CarlaDataProvider.request_new_actor(config.other_actors[0].model, self._other_actor_transform)
