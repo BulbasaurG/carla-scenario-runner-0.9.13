@@ -197,6 +197,9 @@ class CarlaDataProvider(object):  # pylint: disable=too-many-public-methods
             new_dist_lc_vtc = np.sort(new_dist_lc_vtc)
             length_1,width_1 = new_dist_lc_vtc[-2], new_dist_lc_vtc[-3]
 
+            bbox_yaw = rotation.yaw / 180 * np.pi
+            vel_yaw = np.arctan2(-velocity.y, velocity.x)
+
             # actor_history[actor_id]["state/length_1"].append(length_1)
             # actor_history[actor_id]["state/width_1"].append(width_1)
             # actor_history[actor_id]["state/num_dist"].append(num_dist)
@@ -205,10 +208,10 @@ class CarlaDataProvider(object):  # pylint: disable=too-many-public-methods
 
             actor_history[actor_id]["state/x"].append(location.x)
             actor_history[actor_id]["state/y"].append(-location.y)
-            actor_history[actor_id]["state/bbox_yaw"].append(rotation.yaw)
+            actor_history[actor_id]["state/bbox_yaw"].append(bbox_yaw)
             actor_history[actor_id]["state/length"].append(length)
             actor_history[actor_id]["state/width"].append(width) 
-            actor_history[actor_id]["state/vel_yaw"].append(rotation.yaw)  # ToDo: Compute from velocities, not needed for now 16/03/2023
+            actor_history[actor_id]["state/vel_yaw"].append(vel_yaw) 
             actor_history[actor_id]["state/velocity_x"].append(velocity.x)
             actor_history[actor_id]["state/velocity_y"].append(-velocity.y)
             actor_history[actor_id]["state/valid"].append(1)
