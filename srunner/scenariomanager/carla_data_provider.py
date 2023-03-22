@@ -170,6 +170,7 @@ class CarlaDataProvider(object):  # pylint: disable=too-many-public-methods
                 CarlaDataProvider._init_actor_history(actor_id)
                 CarlaDataProvider._actor_id_type_map[actor_id] = actor.type_id
 
+            # note that carla is using left-handed z-up coordinate system
             transform = actor.get_transform()
             location = transform.location
             rotation = transform.rotation
@@ -178,8 +179,8 @@ class CarlaDataProvider(object):  # pylint: disable=too-many-public-methods
             length,width = bbox_extent.x*2, bbox_extent.y*2
             # In the blueprint, bike width is 0 (github issue #5376). We set it to 0.8m
             # Info: Pedestrian width and length are appr. 0.37m.
-            # length = 0.8 if length < 0.8 else length
-            # width = 0.8 if width < 0.8 else width
+            length = 0.8 if length < 0.8 else length
+            width = 0.8 if width < 0.8 else width
 
             # check if the vertices will provide better length and width
             lc_vtc = actor.bounding_box.get_world_vertices(transform)
@@ -203,13 +204,13 @@ class CarlaDataProvider(object):  # pylint: disable=too-many-public-methods
             actor_history[actor_id]["state/width_1"].append(width_1)
 
             actor_history[actor_id]["state/x"].append(location.x)
-            actor_history[actor_id]["state/y"].append(location.y)
+            actor_history[actor_id]["state/y"].append(-location.y)
             actor_history[actor_id]["state/bbox_yaw"].append(rotation.yaw)
-            actor_history[actor_id]["state/length"].append(length)  # ToDo
-            actor_history[actor_id]["state/width"].append(width)  # ToDo
+            actor_history[actor_id]["state/length"].append(length)
+            actor_history[actor_id]["state/width"].append(width) 
             actor_history[actor_id]["state/vel_yaw"].append(rotation.yaw)  # ToDo: Compute from velocities, not needed for now 16/03/2023
             actor_history[actor_id]["state/velocity_x"].append(velocity.x)
-            actor_history[actor_id]["state/velocity_y"].append(velocity.y)
+            actor_history[actor_id]["state/velocity_y"].append(-velocity.y)
             actor_history[actor_id]["state/valid"].append(1)
 
             # print(actor_id, "storing_history", len(CarlaDataProvider._actor_history[actor_id]["state/x"]))
